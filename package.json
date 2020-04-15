@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
+    "start": "node build/server.js",
     "node0": "node build/server.js 3000",
     "node1": "node build/server.js 3001",
     "node2": "node build/server.js 3002"
