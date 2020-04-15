@@ -1,1 +1,1 @@
-worker: node ./app/build/server.js
+web: node ./app/build/server.js
