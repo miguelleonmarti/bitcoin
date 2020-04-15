@@ -13,27 +13,16 @@ export default class Blockchain implements IBlockchain {
   networkNodes: string[];
 
   constructor() {
-    this.currentNodeUrl = "";
+    this.currentNodeUrl = `http://localhost:${process.argv[2]}`;
     this.chain = [this.createGenesisBlock()];
     this.pendingTransactions = [];
     this.networkNodes = [];
-    this.miningReward = 12.5; // TODO: desde el package.json
-    this.difficulty = 5; // TODO: desde el package.json
+    this.miningReward = 12.5;
+    this.difficulty = 5;
   }
 
   createGenesisBlock(): IBlock {
     return new Block([], "0");
-  }
-
-  minePendingTransactions(miningRewardAddress: string): void {
-    const block = new Block(this.pendingTransactions);
-    block.mine(this.difficulty);
-
-    this.chain.push(block);
-
-    this.pendingTransactions = [
-      new Transaction("", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
-    ];
   }
 
   addTransaction(transaction: ITransaction): number {
@@ -46,6 +35,17 @@ export default class Blockchain implements IBlockchain {
     }
 
     return this.pendingTransactions.push(transaction);
+  }
+  
+  minePendingTransactions(miningRewardAddress: string): void {
+    const block = new Block(this.pendingTransactions, this.getLatestBlock().hash);
+    block.mine(this.difficulty);
+
+    this.chain.push(block);
+
+    this.pendingTransactions = [
+      new Transaction("", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
+    ];
   }
 
   addBlock(block: IBlock): void {

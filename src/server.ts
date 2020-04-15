@@ -4,7 +4,7 @@ const app = express();
 
 let PORT: string | number;
 if (process.env.PORT) PORT = process.env.PORT;
-else PORT = 3000;
+else PORT = process.argv[2];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -44,12 +44,10 @@ export const broadcastTransaction = async (req: Request, res: Response) => {
   newTransaction.id = id;
   newTransaction.signature = signature;
 
-  console.log(newTransaction);
   if (!newTransaction.isValid()) {
     return res.json({ message: "Transaction is not valid." });
   }
 
-  console.log("Hey")
   bitcoin.addTransaction(newTransaction);
 
   const promises: Promise<AxiosResponse<any>>[] = [];
@@ -71,18 +69,12 @@ export const broadcastTransaction = async (req: Request, res: Response) => {
 };
 
 export const mine = async (req: Request, res: Response) => {
-  // TODO:
-  const lastBlock: IBlock = bitcoin.getLatestBlock();
-  const previousBlockHash: string = lastBlock.hash;
-
-  const newBlock = bitcoin.addBlock(
-    new Block(bitcoin.pendingTransactions, previousBlockHash)
-  );
+  bitcoin.minePendingTransactions("0"); // TODO: HARDCODE
 
   const promises: Promise<AxiosResponse<any>>[] = [];
   bitcoin.networkNodes.forEach(networkNodeUrl => {
     const promise = axios.post(`${networkNodeUrl}/receive-new-block`, {
-      data: { newBlock: newBlock }
+      data: { newBlock: bitcoin.getLatestBlock() }
     });
     promises.push(promise);
   });
@@ -96,7 +88,7 @@ export const mine = async (req: Request, res: Response) => {
     });
     return res.json({
       message: "New block mined successfully.",
-      block: newBlock
+      block: bitcoin.getLatestBlock()
     });
   } catch (error) {
     return res.status(500).send({ error: error });
@@ -127,13 +119,14 @@ export const receiveNewBlock = (req: Request, res: Response) => {
 };
 
 export const registerAndBroadcastNode = async (req: Request, res: Response) => {
-  const newNodeUrl = req.body.newNodeUrl;
+  const newNodeUrl: string = req.body.newNodeUrl;
 
   // TODO: controlar el else
   if (!bitcoin.networkNodes.includes(newNodeUrl))
     bitcoin.networkNodes.push(newNodeUrl);
 
   const promises: Promise<AxiosResponse<any>>[] = [];
+
   bitcoin.networkNodes.forEach(networkNodeUrl => {
     const promise: Promise<AxiosResponse<any>> = axios.post(
       `${networkNodeUrl}/register-node`,
@@ -149,7 +142,7 @@ export const registerAndBroadcastNode = async (req: Request, res: Response) => {
     await axios.post(`${newNodeUrl}/register-nodes-bulk`, {
       data: {
         allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl]
-      }
+      },
     });
     return res.json({
       message: "New node registered with network successfully."
@@ -160,26 +153,29 @@ export const registerAndBroadcastNode = async (req: Request, res: Response) => {
 };
 
 export const registerNode = (req: Request, res: Response) => {
-  const newNodeUrl = req.body.newNodeUrl;
+  const newNodeUrl = req.body.data.newNodeUrl; // TODO: acabo de poner el data
 
   const nodeNotAlreadyPresent = !bitcoin.networkNodes.includes(newNodeUrl);
   const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
 
-  if (nodeNotAlreadyPresent && notCurrentNode)
+  if (nodeNotAlreadyPresent && notCurrentNode) {
     bitcoin.networkNodes.push(newNodeUrl);
+  }
 
   return res.json({ message: "New node registered successfully." });
 };
 
 export const registerNodesBulk = (req: Request, res: Response) => {
-  const allNetworkNodes = req.body.allNetworkNodes;
+  const allNetworkNodes: string[] = req.body.data.allNetworkNodes;
+
   allNetworkNodes.forEach((networkNodeUrl: string) => {
     const nodeNotAlreadyPresent = !bitcoin.networkNodes.includes(
       networkNodeUrl
     );
     const notCurrentNode = bitcoin.currentNodeUrl !== networkNodeUrl;
-    if (nodeNotAlreadyPresent && notCurrentNode)
+    if (nodeNotAlreadyPresent && notCurrentNode) {
       bitcoin.networkNodes.push(networkNodeUrl);
+    }
   });
 
   return res.json({ message: "Bulk registration successful." });
