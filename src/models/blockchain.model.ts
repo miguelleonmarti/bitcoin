@@ -18,7 +18,7 @@ export default class Blockchain implements IBlockchain {
     this.pendingTransactions = [];
     this.networkNodes = [];
     this.miningReward = 12.5; // TODO: desde el package.json
-    this.difficulty = 4; // TODO: desde el package.json
+    this.difficulty = 5; // TODO: desde el package.json
   }
 
   createGenesisBlock(): IBlock {
@@ -52,6 +52,7 @@ export default class Blockchain implements IBlockchain {
     // TODO: no entiendo este método si hay otro minePendingTransactions
     block.previousHash = this.getLatestBlock().hash;
     block.mine(this.difficulty);
+    this.pendingTransactions = []; // TODO: lo acabo de poner
     this.chain.push(block);
   }
 
@@ -106,9 +107,11 @@ export default class Blockchain implements IBlockchain {
 
   getTransaction(id: string): ITransaction | undefined {
     this.chain.forEach((block: IBlock) => {
-      return block.transactions.find(
+      const t: ITransaction | undefined = block.transactions.find(
         (transaction: ITransaction) => transaction.id === id
       );
+
+      if (t) return t;
     });
     return undefined;
   }

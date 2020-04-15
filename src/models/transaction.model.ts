@@ -28,14 +28,13 @@ export default class Transaction implements ITransaction {
       .join("");
   }
 
-  signTransaction(signPrivateKey: ec.KeyPair): string {
+  signTransaction(signPrivateKey: ec.KeyPair): void {
     if (signPrivateKey.getPublic("hex") !== this.fromAddress) {
       throw new Error("You cannot sign transactions for other wallets!");
     }
 
     const transactionHash = this.calculateHash();
-    const signature = signPrivateKey.sign(transactionHash, "base64");
-    return signature.toDER("hex");
+    this.signature = signPrivateKey.sign(transactionHash, "base64").toDER("hex");
   }
 
   calculateHash(): string {

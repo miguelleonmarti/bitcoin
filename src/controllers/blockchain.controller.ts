@@ -34,13 +34,22 @@ export const createTransaction = (req: Request, res: Response) => {
 };
 
 export const broadcastTransaction = async (req: Request, res: Response) => {
-  const { amount, fromAddress, toAddress, signature } = req.body; // TODO: signature
-  const newTransaction: ITransaction = new Transaction(fromAddress, toAddress, amount);
+  const { amount, fromAddress, toAddress, signature, id } = req.body;
+  const newTransaction: ITransaction = new Transaction(
+    fromAddress,
+    toAddress,
+    amount,
+  );
 
+  newTransaction.id = id;
+  newTransaction.signature = signature;
+
+  console.log(newTransaction);
   if (!newTransaction.isValid()) {
-    return res.json({message: 'Transaction is not valid.'});
+    return res.json({ message: "Transaction is not valid." });
   }
 
+  console.log("Hey")
   bitcoin.addTransaction(newTransaction);
 
   const promises: Promise<AxiosResponse<any>>[] = [];

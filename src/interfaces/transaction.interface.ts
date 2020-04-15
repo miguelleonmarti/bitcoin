@@ -10,5 +10,5 @@ export default interface ITransaction {
     generateId: () => string;
     calculateHash: () => string;
     isValid: () => boolean;
-    signTransaction: (signPrivateKey: ec.KeyPair) => string;
+    signTransaction: (signPrivateKey: ec.KeyPair) => void;
 }
