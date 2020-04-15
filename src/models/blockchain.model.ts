@@ -18,11 +18,15 @@ export default class Blockchain implements IBlockchain {
     this.pendingTransactions = [];
     this.networkNodes = [];
     this.miningReward = 12.5;
-    this.difficulty = 5;
+    this.difficulty = 4;
   }
 
   createGenesisBlock(): IBlock {
-    return new Block([], "0");
+    const genesisBlock: IBlock = new Block([], "0");
+    genesisBlock.timestamp = 1586967497007;
+    genesisBlock.id = "0";
+    genesisBlock.hash = genesisBlock.calculateHash();
+    return genesisBlock;
   }
 
   addTransaction(transaction: ITransaction): number {
@@ -30,21 +34,27 @@ export default class Blockchain implements IBlockchain {
       throw new Error("Transaction must include fromAddress and toAddress");
     }
 
-    if (!transaction.isValid()) {
+    if (!transaction.isValid() && transaction.fromAddress !== "0") {
+      // TODO:  de momento
       throw new Error("Cannot add invalid transaction to chain");
     }
 
-    return this.pendingTransactions.push(transaction);
+    const transactionCopy = Object.assign({}, transaction);
+
+    return this.pendingTransactions.push(transactionCopy);
   }
-  
+
   minePendingTransactions(miningRewardAddress: string): void {
-    const block = new Block(this.pendingTransactions, this.getLatestBlock().hash);
+    const block = new Block(
+      this.pendingTransactions,
+      this.getLatestBlock().hash
+    );
     block.mine(this.difficulty);
 
-    this.chain.push(block);
+    this.chain.push(Object.assign({}, block));
 
     this.pendingTransactions = [
-      new Transaction("", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
+      //new Transaction("0", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
     ];
   }
 
@@ -106,13 +116,11 @@ export default class Blockchain implements IBlockchain {
   }
 
   getTransaction(id: string): ITransaction | undefined {
-    this.chain.forEach((block: IBlock) => {
-      const t: ITransaction | undefined = block.transactions.find(
-        (transaction: ITransaction) => transaction.id === id
-      );
-
+    for (const block of this.chain) {
+      const t = block.transactions.find(transaction => transaction.id === id)
       if (t) return t;
-    });
+    }
+
     return undefined;
   }
 }

@@ -19,9 +19,18 @@ export const getBlockchain = (req: Request, res: Response) => {
 };
 
 export const createTransaction = (req: Request, res: Response) => {
-  const newTransaction: ITransaction = req.body;
+  const { fromAddress, toAddress, amount, id, signature } = req.body.data;
+  const newTransaction: ITransaction = new Transaction(
+    fromAddress,
+    toAddress,
+    amount
+  );
 
-  if (!newTransaction.isValid()) {
+  if (id) newTransaction.id = id;
+  if (signature) newTransaction.signature = signature;
+
+  if (!newTransaction.isValid() && newTransaction.fromAddress !== "0") {
+    // TODO: de momento
     return res.json({ message: "Transaction is not valid" });
   }
 
@@ -35,16 +44,18 @@ export const createTransaction = (req: Request, res: Response) => {
 
 export const broadcastTransaction = async (req: Request, res: Response) => {
   const { amount, fromAddress, toAddress, signature, id } = req.body;
+
   const newTransaction: ITransaction = new Transaction(
     fromAddress,
     toAddress,
-    amount,
+    amount
   );
 
-  newTransaction.id = id;
-  newTransaction.signature = signature;
+  if (id) newTransaction.id = id;
+  if (signature) newTransaction.signature = signature;
 
-  if (!newTransaction.isValid()) {
+  if (!newTransaction.isValid() && newTransaction.fromAddress !== "0") {
+    // TODO: de momento
     return res.json({ message: "Transaction is not valid." });
   }
 
@@ -69,23 +80,28 @@ export const broadcastTransaction = async (req: Request, res: Response) => {
 };
 
 export const mine = async (req: Request, res: Response) => {
-  bitcoin.minePendingTransactions("0"); // TODO: HARDCODE
+  bitcoin.minePendingTransactions("0000"); // TODO: HARDCODE
 
   const promises: Promise<AxiosResponse<any>>[] = [];
+
   bitcoin.networkNodes.forEach(networkNodeUrl => {
     const promise = axios.post(`${networkNodeUrl}/receive-new-block`, {
-      data: { newBlock: bitcoin.getLatestBlock() }
+      data: { newBlock: Object.assign({}, bitcoin.getLatestBlock()) }
     });
     promises.push(promise);
   });
 
   try {
     await Promise.all(promises);
-    await axios.post(`${bitcoin.currentNodeUrl}/transaction/broadcast`, {
-      amount: 12.5,
-      fromAddress: "",
-      toAddress: nodeAddress
-    });
+    const rewardTransaction: ITransaction = new Transaction(
+      "0",
+      nodeAddress,
+      12.5
+    );
+    await axios.post(
+      `${bitcoin.currentNodeUrl}/transaction/broadcast`,
+      Object.assign({}, rewardTransaction)
+    );
     return res.json({
       message: "New block mined successfully.",
       block: bitcoin.getLatestBlock()
@@ -96,7 +112,7 @@ export const mine = async (req: Request, res: Response) => {
 };
 
 export const receiveNewBlock = (req: Request, res: Response) => {
-  const newBlock: IBlock = req.body.newBlock;
+  const newBlock: IBlock = req.body.data.newBlock;
   const lastBlock: IBlock = bitcoin.getLatestBlock();
   const correctHash: boolean = lastBlock.hash === newBlock.previousHash;
   //const correctIndex = lastBlock.index + 1 === newBlock.index; //TODO:
@@ -142,7 +158,7 @@ export const registerAndBroadcastNode = async (req: Request, res: Response) => {
     await axios.post(`${newNodeUrl}/register-nodes-bulk`, {
       data: {
         allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl]
-      },
+      }
     });
     return res.json({
       message: "New node registered with network successfully."
@@ -237,15 +253,20 @@ export const findBlock = (req: Request, res: Response) => {
 
 export const findTransaction = (req: Request, res: Response) => {
   const transactionId = req.params.transactionId;
+
   const transaction: ITransaction | undefined = bitcoin.getTransaction(
     transactionId
   );
 
-  if (transaction)
-    return res.json({
-      transaction: transaction
-    });
-  return res.json({ message: "There is no transaction with this identifier." }); // TODO: test this endpoint
+  if (!transaction) {
+    return res
+      .status(404)
+      .json({ message: "There is no transaction with this identifier." }); // TODO: test this endpoint
+  }
+
+  return res.json({
+    transaction: transaction
+  });
 };
 
 export const findAddress = (req: Request, res: Response) => {
