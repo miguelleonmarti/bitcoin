@@ -30,7 +30,7 @@
    - [sha256](#sha256)
    - [elliptic](#elliptic)
    - [uuid](#uuid)
-8. [Setup del proyecto](#seyup-del-proyecto)
+8. [Setup del proyecto](#setup-del-proyecto)
 
 ## Estructura del proyecto
 
