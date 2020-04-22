@@ -63,12 +63,12 @@
 
 ### Atributos
 
-```typescript
-id: string;                 # identificador único
-fromAddress: string;        # dirección pública del emisor de la transacción
-toAddress: string;          # dirección pública del receptor de la transacción
-amount: number;             # cantidad de bitcoins a enviar
-signature?: string;         # firma del emisor de la transacción
+```ts
+id: string;                 // identificador único
+fromAddress: string;        // dirección pública del emisor de la transacción
+toAddress: string;          // dirección pública del receptor de la transacción
+amount: number;             // cantidad de bitcoins a enviar
+signature?: string;         // firma del emisor de la transacción
 ```
 
 ### Métodos
@@ -106,12 +106,12 @@ signTransaction: (signPrivateKey: ec.KeyPair) => void;
 ### Atributos
 
 ```typescript
-id: string;                     # identificador único
-timestamp: number;              # momento en el que se creó el bloque
-hash: string;                   # hash del bloque actual
-previousHash: string;           # hash del bloque anterior en la cadena de bloques
-nonce: number;                  # número de veces que se ha hecho hash al bloque
-transactions: ITransaction[];   # transacciones que se han incluido en el bloque
+id: string;                     // identificador único
+timestamp: number;              // momento en el que se creó el bloque
+hash: string;                   // hash del bloque actual
+previousHash: string;           // hash del bloque anterior en la cadena de bloques
+nonce: number;                  // número de veces que se ha hecho hash al bloque
+transactions: ITransaction[];   // transacciones que se han incluido en el bloque
 ```
 
 ### Métodos
@@ -152,12 +152,12 @@ hasValidTransactions: () => boolean;
 ### Atributos
 
 ```typescript
-currentNodeUrl: string;                 # Url del nodo actual
-chain: IBlock[];                        # copia de la cadena de bloques
-pendingTransactions: ITransaction[];    # transacciones que no se han incluido en un bloque
-networkNodes: string[];                 # resto de nodos que conforman la red
-difficulty: number;                     # dificultad exigida a los mineros
-miningReward: number;                   # recompensa por bloque minado
+currentNodeUrl: string;                 // Url del nodo actual
+chain: IBlock[];                        // copia de la cadena de bloques
+pendingTransactions: ITransaction[];    // transacciones que no se han incluido en un bloque
+networkNodes: string[];                 // resto de nodos que conforman la red
+difficulty: number;                     // dificultad exigida a los mineros
+miningReward: number;                   // recompensa por bloque minado
 ```
 
 ### Métodos
