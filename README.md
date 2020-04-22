@@ -1,4 +1,4 @@
-# Blockchain
+# Blockchain en Node.js
 
 ## Índice
 
@@ -13,7 +13,9 @@
    - [Blockchain](#blockchain)
      - Atributos
      - Métodos
-3. [Rutas de la API](#rutas-de-la-api)
+3. [Prueba de trabajo](#prueba-de-trabajo)
+4. [Algoritmo de consenso](#algoritmo-de-consenso)
+5. [Rutas de la API](#rutas-de-la-api)
    - [Obtener la blockchain](#obtener-la-blockchain)
    - [Obtener un bloque](#obtener-un-bloque)
    - [Obtener una transacción](#obtener-una-transacción)
@@ -21,8 +23,8 @@
    - [Enviar una transacción](#enviar-una-transacción)
    - [Minar el siguiente bloque](#minar-el-siguiente-bloque)
    - [Realizar el algoritmo de consenso](#realizar-el-algoritmo-de-consenso)
-4. [Controlador](#controlador)
-5. [Librerías utilizadas](#librerías-utilizadas)
+6. [Controlador](#controlador)
+7. [Librerías utilizadas](#librerías-utilizadas)
    - [express](#express)
    - [axios](#axios)
    - [sha256](#sha256)
@@ -213,6 +215,71 @@ getBalanceOfAddress: (address: string) => number;
  * @return {boolean} 'true' si la cadena es válida y 'false' de lo contrario
 */
 isChainValid: (chain: IBlock[]) => boolean;
+```
+
+## Prueba de trabajo
+
+`block.model.ts`
+```typescript
+mine(difficulty: number): void {
+  while (
+    this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")
+  ) {
+    this.nonce++;
+    this.hash = this.calculateHash();
+  }
+}
+```
+
+## Algoritmo de consenso
+
+```typescript
+export const consensus = async (req: Request, res: Response) => {
+  const promises: Promise<AxiosResponse<any>>[] = [];
+
+  bitcoin.networkNodes.forEach((networkNodeUrl: string) => {
+    promises.push(axios.get(`${networkNodeUrl}/blockchain`));
+  });
+
+  try {
+    const blockchains = await Promise.all(promises);
+
+    const currentChainLenght = bitcoin.chain.length;
+    let maxChainLength = currentChainLenght;
+    let newLongestChain = null;
+    let newPendingTransactions = null;
+
+    blockchains.forEach((blockchain: any) => {
+      blockchain = JSON.parse(blockchain);
+      if (blockchain.chain.length > maxChainLength) {
+        maxChainLength = blockchain.chain.length;
+        newLongestChain = blockchain.chain;
+        newPendingTransactions = blockchain.pendingTransactions;
+      }
+    });
+
+    if (
+      !newLongestChain ||
+      (newLongestChain && !bitcoin.isChainValid(newLongestChain))
+    ) {
+      return res.json({
+        message: "Current chain has not been replaced.",
+        chain: bitcoin.chain
+      });
+    } else {
+      bitcoin.chain = newLongestChain;
+      if (newPendingTransactions) {
+        bitcoin.pendingTransactions = newPendingTransactions;
+      }
+      return res.json({
+        message: "This chain has been replaced",
+        chain: bitcoin.chain
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+};
 ```
 
 ## Rutas de la API
@@ -422,6 +489,25 @@ _Envía una transacción a la blockchain._
 - **Ejemplo de petición (usando axios):**
 
   ```typescript
+  (async () => {
+    try {
+      const data = {
+        id: transaction.id,
+        fromAddress: transaction.fromAddress,
+        toAddress: transaction.toAddress,
+        amount: transaction.amount,
+        signature: transaction.signature
+      };
+      const response = await axios.post(
+        `${ROOT_URL}/transaction/broadcast`,
+        data
+      );
+      const result = response.data;
+      console.log(result);
+    } catch (error) {
+      console.error(error.message);
+    }
+  })();
   ```
 
 ## **Minar el siguiente bloque**
@@ -484,6 +570,7 @@ _Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
 
   - **Código:** 200
     **Contenido:**
+
     ```json
 
     ```
@@ -503,8 +590,6 @@ _Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
   ```
 
 ## Controlador
-
-[FALTA]
 
 ## Librerías utilizadas
 
