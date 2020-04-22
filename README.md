@@ -30,6 +30,7 @@
    - [sha256](#sha256)
    - [elliptic](#elliptic)
    - [uuid](#uuid)
+8. [Setup del proyecto](#seyup-del-proyecto)
 
 ## Estructura del proyecto
 
@@ -643,3 +644,27 @@ _Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
   - Descripción: Para la creación de RFC4122 UUID
   - Instalación: `npm install --save uuid @types/uuid`
   - Página principal: https://github.com/uuidjs/uuid
+
+## Setup del proyecto
+
+### Requisitos: tener instalado Node.js y git.
+
+1. Clonar el repositorio: 
+
+    ```git clone https://github.com/miguelleonmarti/bitcoin.git```
+
+2. Instalar las dependecias: 
+
+    ```npm install```
+
+3. Transpilar el proyecto:
+
+    ```npm run tsc```
+
+4. Ejecutar los nodos (en consolas o terminales distintos):
+
+    ```npm run node0```
+
+    ```npm run node1```
+
+    ```npm run node2```
