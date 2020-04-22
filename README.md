@@ -13,9 +13,13 @@
    - [Blockchain](#blockchain)
      - Atributos
      - Métodos
-3. [Prueba de trabajo](#prueba-de-trabajo)
-4. [Algoritmo de consenso](#algoritmo-de-consenso)
-5. [Rutas de la API](#rutas-de-la-api)
+3. [Modelos](#modelos)
+   - [Modelo de transacción](#modelo-de-transacción)
+   - [Modelo de bloque](#modelo-de-bloque)
+   - [Modelo de blockchain](#modelo-de-blockchain)
+4. [Prueba de trabajo](#prueba-de-trabajo)
+5. [Algoritmo de consenso](#algoritmo-de-consenso)
+6. [Rutas de la API](#rutas-de-la-api)
    - [Obtener la blockchain](#obtener-la-blockchain)
    - [Obtener un bloque](#obtener-un-bloque)
    - [Obtener una transacción](#obtener-una-transacción)
@@ -23,14 +27,14 @@
    - [Enviar una transacción](#enviar-una-transacción)
    - [Minar el siguiente bloque](#minar-el-siguiente-bloque)
    - [Realizar el algoritmo de consenso](#realizar-el-algoritmo-de-consenso)
-6. [Controlador](#controlador)
-7. [Librerías utilizadas](#librerías-utilizadas)
+7. [Controlador](#controlador)
+8. [Librerías utilizadas](#librerías-utilizadas)
    - [express](#express)
    - [axios](#axios)
    - [sha256](#sha256)
    - [elliptic](#elliptic)
    - [uuid](#uuid)
-8. [Setup del proyecto](#setup-del-proyecto)
+9. [Setup del proyecto](#setup-del-proyecto)
 
 ## Estructura del proyecto
 
@@ -216,6 +220,303 @@ getBalanceOfAddress: (address: string) => number;
  * @return {boolean} 'true' si la cadena es válida y 'false' de lo contrario
 */
 isChainValid: (chain: IBlock[]) => boolean;
+```
+
+## Modelos
+
+- ## Modelo de transacción
+
+La clase `Transaction` implementa la interfaz `ITransaction`:
+
+```ts
+export default class Transaction implements ITransaction {...}
+```
+
+### Constructor
+
+```typescript
+ constructor(fromAddress: string, toAddress: string, amount: number) {
+    this.id = this.generateId();
+    this.fromAddress = fromAddress;
+    this.toAddress = toAddress;
+    this.amount = amount;
+  }
+```
+
+### Métodos
+
+```ts
+generateId(): string {
+  return uuid()
+    .split("-") // Se eliminan los guiones del identificador generado 
+    .join(""); // por la librería 'uuid'
+}
+```
+
+```ts
+signTransaction(signPrivateKey: ec.KeyPair): void {
+  if (signPrivateKey.getPublic("hex") !== this.fromAddress) {
+    // Si la firma no coincide con la dirección del remitente de
+    // la transacción se lanza una excepción
+    throw new Error("You cannot sign transactions for other wallets!");
+  }
+
+  // Se calcula el hash de la transacción ...
+  const transactionHash = this.calculateHash();
+  // y se firma la transacción
+  this.signature = signPrivateKey.sign(transactionHash, "base64").toDER("hex");
+}
+```
+
+```ts
+calculateHash(): string {
+  // Utilizando la librería 'sha256' calculamos el hash de la
+  // transacción agrupando todos sus atributos en una cadena
+  // de caracteres única
+  return sha256(
+    this.id + this.fromAddress + this.toAddress + this.amount
+  ).toString();
+}
+```
+
+```ts
+isValid(): boolean {
+  // No es válida si no tiene la dirección del remitente
+  if (!this.fromAddress) return false;
+  // Tampoco es válida si no está firmada
+  if (!this.signature || this.signature.length === 0) return false;
+
+  // Y para comprobar que está firmada correctamente utilizamos
+  // el algoritmo de curva elíptica y el hash de la transacción
+  const publicKey = ellipticCurve.keyFromPublic(this.fromAddress, "hex");
+  return publicKey.verify(this.calculateHash(), this.signature);
+}
+```
+
+- ## Modelo de bloque
+
+### Constructor
+
+```ts
+constructor(transactions: ITransaction[], previousHash: string = "") {
+  this.id = this.generateId();
+  this.timestamp = Date.now(); // Se genera el identificador al crear la transacción
+  this.previousHash = previousHash;
+  this.nonce = 0; // Al no haber sido minado todavía, el nonce se inicializa a 0.
+  this.transactions = transactions;
+  this.hash = this.calculateHash();
+}
+```
+
+### Métodos
+
+```ts
+calculateHash(): string {
+  // Utilizando la librería 'sha256' calculamos el hash de la
+  // transacción agrupando todos sus atributos en una cadena
+  // de caracteres única
+  return sha256(
+    this.id +
+      this.timestamp +
+      this.previousHash +
+      this.nonce +
+      JSON.stringify(this.transactions) // Hay que transformar el array a string
+  ).toString();
+}
+```
+
+```ts
+mine(difficulty: number): void {
+  // Mientras el hash del bloque no comience por tantos ceros
+  // como especifique la dificultad (si la dificultad es 5, 
+  // el hash correcto deberá empezar así: "00000"), se volverá
+  // a realizar el hash del bloque aumnetando el nonce, lo que
+  // hará que se modifique el resultado de la operación de hash.
+  // Así tantas veces como sea necesario. Por eso se trata de
+  // "algoritmo de fuerza bruta" que exige una gran capacidad
+  // de computación
+  while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+    this.nonce++;
+    this.hash = this.calculateHash();
+  }
+}
+```
+
+```ts
+hasValidTransactions(): boolean {
+  // Recorre las transacciones del bloque comprobando
+  // una a una que son válidas
+  for (const transaction of this.transactions) {
+    if (!transaction.isValid()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+```
+
+- ## Modelo de blockchain
+
+### Constructor
+
+```ts
+constructor() {
+  // Al desplegar el servidor en Heroku, declaro una variable
+  // de entorno llamada URL que coincide con la dirección URL
+  // raíz del nodo (se declara en Heroku). No obstante, si
+  // se quisiera ejecutar la aplicación en local lo recomendable
+  // sería ejecutar el programa desde la consola pasándole esta
+  // variable como parámetro. De este modo quedaría algo así:
+
+  // this.currentNodeUrl = `${process.args[2]}`
+  // si es que ejecutamos `node run app https:localhost:3000`
+
+  this.currentNodeUrl = `${process.env.URL}`;
+  this.chain = [this.createGenesisBlock()];
+  this.pendingTransactions = [];
+  this.networkNodes = [];
+  this.miningReward = 12.5;
+  this.difficulty = 5; 
+}
+```
+
+### Métodos
+
+```ts
+createGenesisBlock(): IBlock {
+  const genesisBlock: IBlock = new Block([], "0");
+  // Se fija una fecha para el bloque génesis
+  // De lo contrario cada nodo crearía su propio bloque
+  // génesis en instantes distintos.
+  genesisBlock.timestamp = 1586967497007;
+  genesisBlock.id = "0";
+  genesisBlock.hash = genesisBlock.calculateHash();
+  return genesisBlock;
+}
+```
+
+```ts
+addTransaction(transaction: ITransaction): number {
+  // No se puede añadir una transacción que no carezca
+  // de dirección de remitente y receptor
+  if (!transaction.fromAddress || !transaction.toAddress) {
+    throw new Error("Transaction must include fromAddress and toAddress");
+  }
+
+  // Si la transacción no es válida no se añadirá al
+  // contenedor de transacciones pendientes
+  if (!transaction.isValid() && transaction.fromAddress !== "0") {
+    throw new Error("Cannot add invalid transaction to chain");
+  }
+
+  const transactionCopy = Object.assign({}, transaction);
+
+  return this.pendingTransactions.push(transactionCopy);
+}
+```
+
+```ts
+minePendingTransactions(miningRewardAddress: string): void {
+  // Se crea el nuevo bloque y se le añaden
+  // las transacciones pendientes y se enlaza
+  // con el último bloque minado mediante el
+  // hash de éste
+  const block = new Block(
+    this.pendingTransactions,
+    this.getLatestBlock().hash
+  );
+
+  // Se mina el bloque
+  block.mine(this.difficulty);
+
+  // Una vez minado se une a la cadena de bloques
+  this.chain.push(Object.assign({}, block));
+
+  // Y se vacía el array de transacciones pendientes
+  this.pendingTransactions = [];
+}
+```
+
+```ts
+getLatestBlock(): IBlock {
+  return this.chain[this.chain.length - 1];
+}
+```
+
+```ts
+isChainValid(chain: IBlock[]): boolean {
+  const length: number = chain.length;
+  for (let i = 1; i < length; i++) {
+    const currentBlock: IBlock = chain[i];
+    const previousBlock: IBlock = chain[i - 1];
+
+    // La cadena no es válida si uno de los bloques contiene
+    // transacciones no válidas
+    if (!currentBlock.hasValidTransactions()) {
+      return false;
+    }
+
+    // La cadena no es corecta si al realizar el hash de uno
+    // de los bloques, este resultado no coincide con el hash
+    // que tiene como atributo
+    if (currentBlock.hash != currentBlock.calculateHash()) {
+      return false;
+    }
+
+    // La cadena no es válida si los bloques no están "encadenados"
+    // correctamente. El bloque actual debe tener el hash del anterior
+    // bloque como referencia
+    if (currentBlock.previousHash !== previousBlock.hash) {
+      return false;
+    }
+  }
+
+  return true;
+}
+```
+
+```ts
+getBalanceOfAddress(address: string): number {
+  let balance = 0;
+
+  for (const block of this.chain) {
+    for (const transaction of block.transactions) {
+      // Si la dirección es la que envía la transacción
+      // la cantidad enviada supondrá un balance negativo
+      if (transaction.fromAddress === address) {
+        balance -= transaction.amount;
+      }
+
+      // Si la dirección es la que envía la transacción
+      // la cantidad enviada supondrá un balance positivo
+      if (transaction.toAddress === address) {
+        balance += transaction.amount;
+      }
+    }
+  }
+
+  // Si la dirección nunca ha aparecido en
+  // una transacción el resultado será de 0.
+  return balance;
+}
+```
+
+```ts
+getBlock(hash: string): IBlock | undefined {
+  return this.chain.find((block: IBlock) => block.hash === hash);
+}
+```
+
+```ts
+getTransaction(id: string): ITransaction | undefined {
+  for (const block of this.chain) {
+    const t = block.transactions.find(transaction => transaction.id === id)
+    if (t) return t;
+  }
+
+  return undefined;
+}
 ```
 
 ## Prueba de trabajo
@@ -649,22 +950,22 @@ _Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
 
 ### Requisitos: tener instalado Node.js y git.
 
-1. Clonar el repositorio: 
+1. Clonar el repositorio:
 
-    ```git clone https://github.com/miguelleonmarti/bitcoin.git```
+   `git clone https://github.com/miguelleonmarti/bitcoin.git`
 
-2. Instalar las dependecias: 
+2. Instalar las dependecias:
 
-    ```npm install```
+   `npm install`
 
 3. Transpilar el proyecto:
 
-    ```npm run tsc```
+   `npm run tsc`
 
 4. Ejecutar los nodos (en consolas o terminales distintos):
 
-    ```npm run node0```
+   `npm run node0`
 
-    ```npm run node1```
+   `npm run node1`
 
-    ```npm run node2```
+   `npm run node2`
