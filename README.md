@@ -18,6 +18,9 @@
    - [Obtener un bloque](#obtener-un-bloque)
    - [Obtener una transacción](#obtener-una-transacción)
    - [Obtener el saldo de una dirección](#obtener-el-saldo-de-una-dirección)
+   - [Enviar una transacción](#enviar-una-transacción)
+   - [Minar el siguiente bloque](#minar-el-siguiente-bloque)
+   - [Realizar el algoritmo de consenso](#realizar-el-algoritmo-de-consenso)
 4. [Controlador](#controlador)
 5. [Librerías utilizadas](#librerías-utilizadas)
    - [express](#express)
@@ -226,10 +229,10 @@ _Devuelve la copia de la cadena de bloques que el nodo que recibe la petición._
 
   `GET`
 
-- **Success Response:**
+- **Respuesta con éxito:**
 
-  - **Code:** 200 <br />
-  - **Content:**
+  - **Código:** 200
+  - **Contenido:**
     ```json
     {
       "currentNodeUrl": "http://localhost:3000",
@@ -250,7 +253,7 @@ _Devuelve la copia de la cadena de bloques que el nodo que recibe la petición._
     }
     ```
 
-- **Sample Call:**
+- **Ejemplo de petición (usando axios):**
 
   ```typescript
   (async () => {
@@ -278,10 +281,10 @@ _Devuelve una transacción de la cadena de bloques si existe._
 
   `GET`
 
-- **Success Response:**
+- **Respuesta con éxito:**
 
-  - **Code:** 200 <br />
-    **Content:**
+  - **Código:** 200
+    **Contenido:**
     ```json
     {
       "id": "2feb5e3083cd11eaa13d5173deda1f20",
@@ -292,7 +295,7 @@ _Devuelve una transacción de la cadena de bloques si existe._
     }
     ```
 
-- **Sample Call:**
+- **Ejemplo de petición (usando axios):**
 
   ```typescript
   (async () => {
@@ -322,10 +325,10 @@ _Devuelve un bloque de la cadena de bloques si existe._
 
   `GET`
 
-- **Success Response:**
+- **Respuesta con éxito:**
 
-  - **Code:** 200 <br />
-    **Content:**
+  - **Código:** 200
+    **Contenido:**
     ```json
     {
       "id": "4512412083cd11ea87dc7be01b243e32",
@@ -345,7 +348,7 @@ _Devuelve un bloque de la cadena de bloques si existe._
     }
     ```
 
-- **Sample Call:**
+- **Ejemplo de petición (usando axios):**
 
   ```typescript
   (async () => {
@@ -373,15 +376,15 @@ _Devuelve el saldo dada una dirección._
 
   `GET`
 
-- **Success Response:**
+- **Respuesta con éxito:**
 
-  - **Code:** 200 <br />
-    **Content:**
+  - **Código:** 200
+    **Contenido:**
     ```json
     { "balance": 10 }
     ```
 
-- **Sample Call:**
+- **Ejemplo de petición (usando axios):**
 
   ```typescript
   (async () => {
@@ -389,6 +392,110 @@ _Devuelve el saldo dada una dirección._
       const response = await axios.get(`${ROOT_URL}/address/${address}`);
       const balance = response.data.balance;
       console.log(balance);
+    } catch (error) {
+      console.error(error.message);
+    }
+  })();
+  ```
+
+## **Enviar una transacción**
+
+_Envía una transacción a la blockchain._
+
+- **URL**
+
+  `/transaction/broadcast`
+
+- **Método:**
+
+  `POST`
+
+- **Respuesta con éxito:**
+
+  - **Código:** 200
+    **Contenido:**
+
+    ```json
+
+    ```
+
+- **Ejemplo de petición (usando axios):**
+
+  ```typescript
+  ```
+
+## **Minar el siguiente bloque**
+
+_Comienza a ejecutar el algoritmo de minado del nodo al que se envía la petición._
+
+- **URL**
+
+  `/mine`
+
+- **Método:**
+
+  `GET`
+
+- **Respuesta con éxito:**
+
+  - **Código:** 200
+  - **Contenido:**
+    ```json
+    {
+      "message": "New block mined successfully.",
+      "block": {
+        "id": "d8e8bf70847a11eaad0f73f87b355545",
+        "timestamp": 1587547374824,
+        "previousHash": "7dbd505d358dca188c333293495cb45b220b1993eba0248cd82c16672d5954df",
+        "nonce": 12711,
+        "transactions": [],
+        "hash": "00009ff37a4be3edd5df67615a0e55cc00801301ec29003ddffb705a0c1ffecb"
+      }
+    }
+    ```
+
+- **Ejemplo de petición (usando axios):**
+
+  ```typescript
+  (async () => {
+    try {
+      const response = await axios.get(`${ROOT_URL}/mine`);
+      const newBlock = response.data;
+      console.log(newBlock);
+    } catch (error) {
+      console.error(error.message);
+    }
+  })();
+  ```
+
+## **Realizar el algoritmo de consenso**
+
+_Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
+
+- **URL**
+
+  `/consensus`
+
+- **Método:**
+
+  `GET`
+
+- **Respuesta con éxito:**
+
+  - **Código:** 200
+    **Contenido:**
+    ```json
+
+    ```
+
+- **Ejemplo de petición (usando axios):**
+
+  ```typescript
+  (async () => {
+    try {
+      const response = await axios.get(`${ROOT_URL}/consensus`);
+      const result = response.data;
+      console.log(result);
     } catch (error) {
       console.error(error.message);
     }
