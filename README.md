@@ -224,7 +224,9 @@ isChainValid: (chain: IBlock[]) => boolean;
 
 ## Modelos
 
+---
 - ## Modelo de transacción
+---
 
 La clase `Transaction` implementa la interfaz `ITransaction`:
 
@@ -293,8 +295,9 @@ isValid(): boolean {
 }
 ```
 
+---
 - ## Modelo de bloque
-
+---
 ### Constructor
 
 ```ts
@@ -355,8 +358,9 @@ hasValidTransactions(): boolean {
   return true;
 }
 ```
-
+---
 - ## Modelo de blockchain
+---
 
 ### Constructor
 
