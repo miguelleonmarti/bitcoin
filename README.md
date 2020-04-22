@@ -220,6 +220,7 @@ isChainValid: (chain: IBlock[]) => boolean;
 ## Prueba de trabajo
 
 `block.model.ts`
+
 ```typescript
 mine(difficulty: number): void {
   while (
@@ -351,7 +352,7 @@ _Devuelve una transacción de la cadena de bloques si existe._
 - **Respuesta con éxito:**
 
   - **Código:** 200
-    **Contenido:**
+  - **Contenido:**
     ```json
     {
       "id": "2feb5e3083cd11eaa13d5173deda1f20",
@@ -395,7 +396,7 @@ _Devuelve un bloque de la cadena de bloques si existe._
 - **Respuesta con éxito:**
 
   - **Código:** 200
-    **Contenido:**
+  - **Contenido:**
     ```json
     {
       "id": "4512412083cd11ea87dc7be01b243e32",
@@ -446,7 +447,7 @@ _Devuelve el saldo dada una dirección._
 - **Respuesta con éxito:**
 
   - **Código:** 200
-    **Contenido:**
+  - **Contenido:**
     ```json
     { "balance": 10 }
     ```
@@ -480,7 +481,7 @@ _Envía una transacción a la blockchain._
 - **Respuesta con éxito:**
 
   - **Código:** 200
-    **Contenido:**
+  - **Contenido:**
 
     ```json
 
@@ -569,10 +570,22 @@ _Ejecuta el algoritmo de consenso en el nodo que recibe la petición._
 - **Respuesta con éxito:**
 
   - **Código:** 200
-    **Contenido:**
+  - **Contenido:**
 
     ```json
-
+    {
+      "message": "Current chain has not been replaced.",
+      "chain": [
+        {
+          "id": "0",
+          "timestamp": 1586967497007,
+          "previousHash": "0",
+          "nonce": 0,
+          "transactions": [],
+          "hash": "7dbd505d358dca188c333293495cb45b220b1993eba0248cd82c16672d5954df"
+        }
+      ]
+    }
     ```
 
 - **Ejemplo de petición (usando axios):**
