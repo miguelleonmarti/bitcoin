@@ -18,7 +18,7 @@ export default class Blockchain implements IBlockchain {
     this.pendingTransactions = [];
     this.networkNodes = [];
     this.miningReward = 12.5;
-    this.difficulty = 3;
+    this.difficulty = 2;
   }
 
   createGenesisBlock(): IBlock {
