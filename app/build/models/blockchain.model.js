@@ -11,7 +11,7 @@ var Blockchain = /** @class */ (function () {
         this.pendingTransactions = [];
         this.networkNodes = [];
         this.miningReward = 12.5;
-        this.difficulty = 5;
+        this.difficulty = 3;
     }
     Blockchain.prototype.createGenesisBlock = function () {
         var genesisBlock = new block_model_1.default([], "0");
