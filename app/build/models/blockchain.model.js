@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var block_model_1 = __importDefault(require("./block.model"));
 var Blockchain = /** @class */ (function () {
     function Blockchain() {
-        this.currentNodeUrl = "" + process.env.URL; //`http://localhost:${process.argv[2]}`;
+        this.currentNodeUrl = "http://localhost:3000"; //`http://localhost:${process.argv[2]}`;
         this.chain = [this.createGenesisBlock()];
         this.pendingTransactions = [];
         this.networkNodes = [];

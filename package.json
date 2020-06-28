@@ -8,7 +8,8 @@
     "start": "node build/server.js",
     "node0": "node build/server.js 3000",
     "node1": "node build/server.js 3001",
-    "node2": "node build/server.js 3002"
+    "node2": "node build/server.js 3002",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -34,10 +35,35 @@
     "elliptic": "^6.5.2",
     "express": "^4.17.1",
     "sha256": "^0.2.0",
+    "ts-jest": "^26.1.1",
     "typescript": "^3.8.3",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "nodemon": "^2.0.3"
+    "@types/jest": "^26.0.3",
+    "@types/supertest": "^2.0.9",
+    "jest": "^26.1.0",
+    "nodemon": "^2.0.3",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.json"
+      }
+    }
+    
   }
 }

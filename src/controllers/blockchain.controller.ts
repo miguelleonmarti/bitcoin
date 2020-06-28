@@ -93,11 +93,14 @@ export const mine = async (req: Request, res: Response) => {
 
   try {
     await Promise.all(promises);
+   
+    
     const rewardTransaction: ITransaction = new Transaction(
       "0",
       nodeAddress,
       12.5
     );
+   
     await axios.post(
       `${bitcoin.currentNodeUrl}/transaction/broadcast`,
       Object.assign({}, rewardTransaction)

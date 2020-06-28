@@ -4,13 +4,16 @@ const app = express();
 
 let PORT: string | number;
 if (process.env.PORT) PORT = process.env.PORT;
-else PORT = process.argv[2];
+else if (process.argv[2]) PORT = process.argv[2];
+else PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", router);
 
-app.listen(PORT, () =>
-  console.log(`Server is listening on http://localhost:${PORT}`)
+const server = app.listen(PORT
+  // console.log(`Server is listening on http://localhost:${PORT}`)
 );
+
+export default server;

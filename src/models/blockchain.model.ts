@@ -13,7 +13,7 @@ export default class Blockchain implements IBlockchain {
   networkNodes: string[];
 
   constructor() {
-    this.currentNodeUrl = `${process.env.URL}`  //`http://localhost:${process.argv[2]}`;
+    this.currentNodeUrl = `http://localhost:3000`;  //`http://localhost:${process.argv[2]}`;
     this.chain = [this.createGenesisBlock()];
     this.pendingTransactions = [];
     this.networkNodes = [];

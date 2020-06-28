@@ -9,11 +9,14 @@ var app = express_1.default();
 var PORT;
 if (process.env.PORT)
     PORT = process.env.PORT;
-else
+else if (process.argv[2])
     PORT = process.argv[2];
+else
+    PORT = 3000;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use("/", routes_1.default);
-app.listen(PORT, function () {
-    return console.log("Server is listening on http://localhost:" + PORT);
-});
+var server = app.listen(PORT
+// console.log(`Server is listening on http://localhost:${PORT}`)
+);
+exports.default = server;
