@@ -315,15 +315,12 @@ constructor(transactions: ITransaction[], previousHash: string = "") {
 
 ```ts
 calculateHash(): string {
-  // Utilizando la librería 'sha256' calculamos el hash de la
-  // transacción agrupando todos sus atributos en una cadena
-  // de caracteres única
   return sha256(
     this.id +
       this.timestamp +
       this.previousHash +
       this.nonce +
-      JSON.stringify(this.transactions) // Hay que transformar el array a string
+      JSON.stringify(this.transactions)
   ).toString();
 }
 ```
