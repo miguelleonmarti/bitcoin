@@ -13,7 +13,10 @@ export default class Blockchain implements IBlockchain {
   networkNodes: string[];
 
   constructor() {
-    this.currentNodeUrl = `http://localhost:3000`;  //`http://localhost:${process.argv[2]}`;
+    if (process.env.URL) this.currentNodeUrl = `${process.env.URL}`;
+    else if (process.argv[2])
+      this.currentNodeUrl = `http://localhost:${process.argv[2]}`;
+    else this.currentNodeUrl = `http://localhost:3000`;
     this.chain = [this.createGenesisBlock()];
     this.pendingTransactions = [];
     this.networkNodes = [];
@@ -117,7 +120,7 @@ export default class Blockchain implements IBlockchain {
 
   getTransaction(id: string): ITransaction | undefined {
     for (const block of this.chain) {
-      const t = block.transactions.find(transaction => transaction.id === id)
+      const t = block.transactions.find(transaction => transaction.id === id);
       if (t) return t;
     }
 
