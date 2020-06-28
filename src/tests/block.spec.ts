@@ -40,6 +40,6 @@ describe("Block model methods", () => {
         mockBlock.nonce = 0;
         mockBlock.mine(5);
         expect(mockBlock.hash.substring(0, 5)).toEqual("00000")
-        expect(mockBlock.nonce).toEqual(548969)
+        expect(mockBlock.nonce).toEqual(548960)
     })
 })
