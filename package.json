@@ -4,7 +4,7 @@
   "description": "Blockchain based on Bitcoin.",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
+    "build": "tsc",
     "start": "node build/server.js",
     "node0": "node build/server.js 3000",
     "node1": "node build/server.js 3001",
