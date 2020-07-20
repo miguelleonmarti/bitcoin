@@ -136,7 +136,9 @@ exports.mine = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
                 return [4 /*yield*/, Promise.all(promises)];
             case 2:
                 _a.sent();
-                rewardTransaction = new transaction_model_1.default("0", process.env.NODE_ADDRESS, bitcoin.miningReward);
+                rewardTransaction = new transaction_model_1.default("0", 
+                // process.env.NODE_ADDRESS as string,
+                "0430de2780299a76a062634c32bf2738d56b808f497750c9f9cd18a30ef4a09f57b95f78274fe2c8ae82e64bd800b8e3d4998eca6b4815a95444854549080862aa", bitcoin.miningReward);
                 return [4 /*yield*/, axios_1.default.post(bitcoin.currentNodeUrl + "/transaction/broadcast", Object.assign({}, rewardTransaction))];
             case 3:
                 _a.sent();

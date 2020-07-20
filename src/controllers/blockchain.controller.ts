@@ -96,7 +96,8 @@ export const mine = async (req: Request, res: Response) => {
 
     const rewardTransaction: ITransaction = new Transaction(
       "0",
-      process.env.NODE_ADDRESS as string,
+      // process.env.NODE_ADDRESS as string,
+      `0430de2780299a76a062634c32bf2738d56b808f497750c9f9cd18a30ef4a09f57b95f78274fe2c8ae82e64bd800b8e3d4998eca6b4815a95444854549080862aa`,
       bitcoin.miningReward
     );
 
