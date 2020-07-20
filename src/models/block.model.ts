@@ -1,4 +1,4 @@
-import uuid from "uuid/v1";
+import {v1 as uuid} from "uuid";
 import sha256 from "sha256";
 import IBlock from "../interfaces/block.interface";
 import ITransaction from "../interfaces/transaction.interface";

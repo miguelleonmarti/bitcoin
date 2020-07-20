@@ -86,16 +86,16 @@ describe("Blockchain endpoints at first", function () {
                     return [2 /*return*/];
             }
         });
-    }); }),
-        afterAll(function () { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                try {
-                    server_1.default.close();
-                }
-                catch (error) {
-                    console.log(error);
-                }
-                return [2 /*return*/];
-            });
-        }); });
+    }); });
+    afterAll(function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            try {
+                server_1.default.close();
+            }
+            catch (error) {
+                console.log(error);
+            }
+            return [2 /*return*/];
+        });
+    }); });
 });

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var v1_1 = __importDefault(require("uuid/v1"));
+var uuid_1 = require("uuid");
 var sha256_1 = __importDefault(require("sha256"));
 var Block = /** @class */ (function () {
     function Block(transactions, previousHash) {
@@ -16,7 +16,7 @@ var Block = /** @class */ (function () {
         this.hash = this.calculateHash();
     }
     Block.prototype.generateId = function () {
-        return v1_1.default()
+        return uuid_1.v1()
             .split("-")
             .join("");
     };

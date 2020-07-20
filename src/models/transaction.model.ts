@@ -1,5 +1,5 @@
 import ITransaction from "../interfaces/transaction.interface";
-import uuid from "uuid/v1";
+import {v1 as uuid} from "uuid";
 import sha256 from "sha256";
 import { ec } from "elliptic";
 const ellipticCurve = new ec("secp256k1");

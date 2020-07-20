@@ -47,7 +47,7 @@ export default class Blockchain implements IBlockchain {
     return this.pendingTransactions.push(transactionCopy);
   }
 
-  minePendingTransactions(miningRewardAddress: string): void {
+  minePendingTransactions(): void {
     const block = new Block(
       this.pendingTransactions,
       this.getLatestBlock().hash
@@ -56,9 +56,7 @@ export default class Blockchain implements IBlockchain {
 
     this.chain.push(Object.assign({}, block));
 
-    this.pendingTransactions = [
-      //new Transaction("0", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
-    ];
+    this.pendingTransactions = [];
   }
 
   addBlock(block: IBlock): void {

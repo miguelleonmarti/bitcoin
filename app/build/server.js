@@ -16,7 +16,5 @@ else
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use("/", routes_1.default);
-var server = app.listen(PORT
-// console.log(`Server is listening on http://localhost:${PORT}`)
-);
+var server = app.listen(PORT);
 exports.default = server;

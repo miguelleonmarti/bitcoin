@@ -122,7 +122,7 @@ exports.mine = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                bitcoin.minePendingTransactions("0000"); // TODO: HARDCODE
+                bitcoin.minePendingTransactions();
                 promises = [];
                 bitcoin.networkNodes.forEach(function (networkNodeUrl) {
                     var promise = axios_1.default.post(networkNodeUrl + "/receive-new-block", {
@@ -136,7 +136,7 @@ exports.mine = function (req, res) { return __awaiter(void 0, void 0, void 0, fu
                 return [4 /*yield*/, Promise.all(promises)];
             case 2:
                 _a.sent();
-                rewardTransaction = new transaction_model_1.default("0", nodeAddress, 12.5);
+                rewardTransaction = new transaction_model_1.default("0", process.env.NODE_ADDRESS, bitcoin.miningReward);
                 return [4 /*yield*/, axios_1.default.post(bitcoin.currentNodeUrl + "/transaction/broadcast", Object.assign({}, rewardTransaction))];
             case 3:
                 _a.sent();

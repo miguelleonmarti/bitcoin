@@ -19,7 +19,7 @@ describe("Blockchain endpoints at first", () => {
     const res = await request.agent(app).get("/blockchain");
     expect(res.status).toEqual(200);
     expect(res.body).toMatchObject(new Blockchain())
-  })
+  });
   test("Mine a new block", async () => {
     const res = await request.agent(app).get("/mine");
     expect(res.status).toEqual(200);
@@ -29,7 +29,7 @@ describe("Blockchain endpoints at first", () => {
     expect(res.body.block).toHaveProperty('nonce');
     expect(res.body.block).toHaveProperty('transactions');
     expect(res.body.block).toHaveProperty('hash');
-  }),
+  });
     afterAll(async () => {
       try {
         app.close();

@@ -12,8 +12,8 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", router);
 
-const server = app.listen(PORT
-  // console.log(`Server is listening on http://localhost:${PORT}`)
-);
+const server = app.listen(PORT);
 
 export default server;
+
+

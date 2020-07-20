@@ -80,7 +80,7 @@ export const broadcastTransaction = async (req: Request, res: Response) => {
 };
 
 export const mine = async (req: Request, res: Response) => {
-  bitcoin.minePendingTransactions("0000"); // TODO: HARDCODE
+  bitcoin.minePendingTransactions();
 
   const promises: Promise<AxiosResponse<any>>[] = [];
 
@@ -93,14 +93,13 @@ export const mine = async (req: Request, res: Response) => {
 
   try {
     await Promise.all(promises);
-   
-    
+
     const rewardTransaction: ITransaction = new Transaction(
       "0",
-      nodeAddress,
-      12.5
+      process.env.NODE_ADDRESS as string,
+      bitcoin.miningReward
     );
-   
+
     await axios.post(
       `${bitcoin.currentNodeUrl}/transaction/broadcast`,
       Object.assign({}, rewardTransaction)

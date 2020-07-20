@@ -6,7 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var block_model_1 = __importDefault(require("./block.model"));
 var Blockchain = /** @class */ (function () {
     function Blockchain() {
-        this.currentNodeUrl = "http://localhost:3000"; //`http://localhost:${process.argv[2]}`;
+        if (process.env.URL)
+            this.currentNodeUrl = "" + process.env.URL;
+        else if (process.argv[2])
+            this.currentNodeUrl = "http://localhost:" + process.argv[2];
+        else
+            this.currentNodeUrl = "http://localhost:3000";
         this.chain = [this.createGenesisBlock()];
         this.pendingTransactions = [];
         this.networkNodes = [];
@@ -31,13 +36,11 @@ var Blockchain = /** @class */ (function () {
         var transactionCopy = Object.assign({}, transaction);
         return this.pendingTransactions.push(transactionCopy);
     };
-    Blockchain.prototype.minePendingTransactions = function (miningRewardAddress) {
+    Blockchain.prototype.minePendingTransactions = function () {
         var block = new block_model_1.default(this.pendingTransactions, this.getLatestBlock().hash);
         block.mine(this.difficulty);
         this.chain.push(Object.assign({}, block));
-        this.pendingTransactions = [
-        //new Transaction("0", miningRewardAddress, this.miningReward) // TODO:  revisar lo del fromAddress
-        ];
+        this.pendingTransactions = [];
     };
     Blockchain.prototype.addBlock = function (block) {
         // TODO: no entiendo este método si hay otro minePendingTransactions
